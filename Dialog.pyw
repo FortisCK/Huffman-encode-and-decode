@@ -7,7 +7,7 @@ from NodeDataIO import *
 from decode import *
 import tkinter.messagebox
 from tkinter.filedialog import *
-import re, random
+import os, re, random, shutil
 
 
 class MyDialog:
@@ -186,6 +186,15 @@ class MyDialog:
 
     # 重置所有文本框
     def __reset(self):
+        filepath = "password dictionary"
+        del_list = os.listdir(filepath)
+        for f in del_list:
+            file_path = os.path.join(filepath, f)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        tkinter.messagebox.showinfo(title='提示', message='所有字典库已删除')
         self.string['state'] = 'normal'
         self.encoding['state'] = 'normal'
         self.string.delete('0.0', END)
