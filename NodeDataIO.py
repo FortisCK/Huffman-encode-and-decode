@@ -5,6 +5,7 @@
 '''
 import random, os
 
+
 class NodeDataIO:
     def __init__(self):
         root = "password dictionary"
@@ -17,10 +18,7 @@ class NodeDataIO:
         self.fr = open("password dictionary/"
                        + self.fileName1, 'r', encoding='utf-8', errors='ignore')
 
-        #self.fileName = '
-
-
-    #从文件中读取下一个节点的信息
+    # 从文件中读取下一个节点的信息
     def __readNextNode(self):
         node = self.fr.readline().strip('\n')
         if node == '':
@@ -28,7 +26,7 @@ class NodeDataIO:
             return None
         return node.split('=')
 
-    #返回文件中所有节点信息构成的列表
+    # 返回文件中所有节点信息构成的列表
     def getNodes(self):
         nodes = []
         node = self.__readNextNode()
@@ -45,9 +43,7 @@ class NodeDataIO:
             fw.write(string)
         fw.close()
 
+
 if __name__ == '__main__':
     io = NodeDataIO()
-    print (io.getNodes())
-
-
-
+    print(io.getNodes())
