@@ -63,8 +63,8 @@ class HuffumanTree:
     def __encode(self, root):
         if root.lchild == None:
             return
-        root.lchild.encoding = '歪'
-        root.rchild.encoding = '比'
+        root.lchild.encoding = '1'
+        root.rchild.encoding = '0'
         self.__encode(root.lchild)
         self.__encode(root.rchild)
 

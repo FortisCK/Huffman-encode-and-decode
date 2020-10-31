@@ -17,12 +17,10 @@ class MyDialog:
         Label(root, text="明文：").grid(row=1, column=0)
         Label(root, text="密文：").grid(row=5, column=0)
         Label(root, height=2).grid(row=3)
-        Label(root, height=2).grid(row=7)
+        self.Key = Text(root, height=10)
         Frame1 = Frame(root).grid(row=8)
         self.string = Text(root)
         self.encoding = Text(root)
-        self.string['width'] = 40
-        self.encoding['width'] = 40
         self.string['height'] = 10
         self.encoding['height'] = 10
         self.string.bind('<FocusIn>', self.focusString)
@@ -45,6 +43,7 @@ class MyDialog:
         getEnc.grid(row=4, column=2)
         putStr.grid(row=2, column=2)
         putEnc.grid(row=6, column=2)
+        self.Key.grid(row=7,column=1)
         root.mainloop()
 
     def dictionary(self):
@@ -174,9 +173,18 @@ class MyDialog:
 
             try:
                 encoding = bin(int(io.fileName1[10:13]))[2:] + encoder.getStringEncoding(text)
+                key=[random.choice(['0','1']) for i in range(len(encoding))]
+                key=''.join(key)
+                print(key)
+
+                encoding_int=int(encoding,2)
+                key_int=int(key,2)
+                encoding=bin(encoding_int^key_int)[2:]
             except:
                 tkinter.messagebox.showerror('错误', '您输入的文本中包含未编码的字符，请重新输入！')
                 return
+            self.Key.delete('0.0', END)
+            self.Key.insert('0.0', key)
             self.encoding['state'] = 'normal'
             self.encoding.delete('0.0', END)
             self.encoding.insert('0.0', encoding)
@@ -204,24 +212,36 @@ class MyDialog:
 
     def decode(self):
         text = self.encoding.get('0.0', END).strip('\n')
-        if text.startswith(bin(int(self.count))[2:]):
-            text = text[len(bin(int(self.count))[2:]):]
-        global de_fr
-        de_fr = open('password dictionary/dictionary'
-                     + self.count + '.txt', 'r', encoding='utf-8', errors='ignore')
-        new = Decode(de_fr)
-        nodeList = new.getNodes()
-        tree = HuffumanTree(nodeList)
-        encoder = Encoding(tree.encodingList)
-        try:
-            string = encoder.getStringDecoding(str(text))
-        except:
-            tkinter.messagebox.showerror('错误', '无法解码，请重新输入!')
+        if text =='':
+            tkinter.messagebox.showerror('错误','请输入密文或选择文件')
             return
-        self.string['state'] = 'normal'
-        self.string.delete('0.0', END)
-        self.string.insert('0.0', string)
-        self.__reset.focus_set()
+        key = self.Key.get('0.0', END).strip('\n')
+        if key == '':
+            tkinter.messagebox.showerror('错误', '请输入密钥')
+            return
+        text = bin(int(text,2)^int(key,2))[2:]
+        try:
+            for i in os.listdir('password dictionary'):
+                if text.startswith(bin(int(i[-7:-4]))[2:]):
+                    text = text[len(bin(int(i[-7:-4]))[2:]):]
+                    global de_fr
+                    de_fr = open('password dictionary/dictionary'+ i[-7:-4] + '.txt', 'r', encoding='utf-8', errors='ignore')
+            new = Decode(de_fr)
+            nodeList = new.getNodes()
+            tree = HuffumanTree(nodeList)
+            encoder = Encoding(tree.encodingList)
+            try:
+                string = encoder.getStringDecoding(str(text))
+            except:
+                tkinter.messagebox.showerror('错误', '无法解码，请重新输入!')
+                return
+            self.string['state'] = 'normal'
+            self.string.delete('0.0', END)
+            self.string.insert('0.0', string)
+            self.__reset.focus_set()
+        except:
+            tkinter.messagebox.showerror('错误', '缺少字典文件')
+            return
 
 
 MyDialog()
