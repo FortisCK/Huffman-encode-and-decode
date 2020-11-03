@@ -3,14 +3,14 @@
 
 import tkinter
 from HuffumanTree import *
-from NodeDataIO import *
+from CollectNode import *
 from decode import *
 import tkinter.messagebox
 from tkinter.filedialog import *
 import os, re, random, shutil
 
 
-class MyDialog:
+class Menu:
     def __init__(self):
         root = Tk()
         root.title('芜湖，起飞')
@@ -43,7 +43,7 @@ class MyDialog:
         getEnc.grid(row=4, column=2)
         putStr.grid(row=2, column=2)
         putEnc.grid(row=6, column=2)
-        self.Key.grid(row=7,column=1)
+        self.Key.grid(row=7, column=1)
         root.mainloop()
 
     def dictionary(self):
@@ -149,12 +149,16 @@ class MyDialog:
 
     # 字符和编码之间相互转化
     def transform(self):
-        io = NodeDataIO()
-        nodeList = io.getNodes()
-        tree = HuffumanTree(nodeList)
-        encoder = Encoding(tree.encodingList)
-        count = io.fileName1[10:13]
-        self.count = count
+        try:
+            io = CollectNode()
+            nodeList = io.getNodes()
+            tree = HuffumanTree(nodeList)
+            encoder = Encoding(tree.encodingList)
+            count = io.fileName1[10:13]
+            self.count = count
+        except:
+            tkinter.messagebox.showerror('错误', '无法选择解密字典')
+            return
         if (self.encoding['state'] != 'disabled') and (self.string['state'] != 'disabled'):
             return
         elif (self.encoding['state'] == 'disabled') and (self.string['state'] != 'disabled'):
@@ -173,13 +177,13 @@ class MyDialog:
 
             try:
                 encoding = bin(int(io.fileName1[10:13]))[2:] + encoder.getStringEncoding(text)
-                key=[random.choice(['0','1']) for i in range(len(encoding))]
-                key=''.join(key)
+                key = [random.choice(['0', '1']) for i in range(len(encoding))]
+                key = ''.join(key)
                 print(key)
 
-                encoding_int=int(encoding,2)
-                key_int=int(key,2)
-                encoding=bin(encoding_int^key_int)[2:]
+                encoding_int = int(encoding, 2)
+                key_int = int(key, 2)
+                encoding = bin(encoding_int ^ key_int)[2:]
             except:
                 tkinter.messagebox.showerror('错误', '您输入的文本中包含未编码的字符，请重新输入！')
                 return
@@ -205,27 +209,30 @@ class MyDialog:
         tkinter.messagebox.showinfo(title='提示', message='所有字典库已删除')
         self.string['state'] = 'normal'
         self.encoding['state'] = 'normal'
+        self.Key['state'] = 'normal'
         self.string.delete('0.0', END)
         self.encoding.delete('0.0', END)
+        self.Key.delete('0.0', END)
 
         self.__reset.focus_set()
 
     def decode(self):
         text = self.encoding.get('0.0', END).strip('\n')
-        if text =='':
-            tkinter.messagebox.showerror('错误','请输入密文或选择文件')
+        if text == '':
+            tkinter.messagebox.showerror('错误', '请输入密文或选择文件')
             return
         key = self.Key.get('0.0', END).strip('\n')
         if key == '':
             tkinter.messagebox.showerror('错误', '请输入密钥')
             return
-        text = bin(int(text,2)^int(key,2))[2:]
+        text = bin(int(text, 2) ^ int(key, 2))[2:]
         try:
             for i in os.listdir('password dictionary'):
                 if text.startswith(bin(int(i[-7:-4]))[2:]):
                     text = text[len(bin(int(i[-7:-4]))[2:]):]
                     global de_fr
-                    de_fr = open('password dictionary/dictionary'+ i[-7:-4] + '.txt', 'r', encoding='utf-8', errors='ignore')
+                    de_fr = open('password dictionary/dictionary' + i[-7:-4] + '.txt', 'r', encoding='utf-8',
+                                 errors='ignore')
             new = Decode(de_fr)
             nodeList = new.getNodes()
             tree = HuffumanTree(nodeList)
@@ -244,4 +251,4 @@ class MyDialog:
             return
 
 
-MyDialog()
+Menu()

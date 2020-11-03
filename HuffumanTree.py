@@ -3,7 +3,7 @@
 
 import sys
 
-sys.setrecursionlimit(1000000)
+sys.setrecursionlimit(1000000) #递归深度调整
 
 '''
 哈夫曼树节点结构
@@ -23,21 +23,19 @@ class TreeNode:
         self.weight = weight
 
 
-'''   
-哈夫曼树
-'''
 
-
+#哈夫曼树
 class HuffumanTree:
     def __init__(self, nodeList):
         self.fw = None
         self.encodingList = {}
-        nodeList = self.__nodesToObjets(nodeList)
+        nodeList = self.__nodesList(nodeList)
         self.root = self.__createTree(nodeList)
         self.__encode(self.root)
         self.reachAllLeafs(self.root)
 
-    def __nodesToObjets(self, nodeList):
+    # 将字符和对应权值以python的列表结构存储
+    def __nodesList(self, nodeList):
         newList = []
         for node in nodeList:
             obj = TreeNode(value=node[0], weight=int(node[1]))
@@ -84,12 +82,12 @@ class HuffumanTree:
             return node2 if node1 == None else node1
 
     # 从叶子节点node开始，回到跟节点，同时获取该节点的哈夫曼码
-    def __goForAncestor(self, node, encoding):
+    def __goToRoot(self, node, encoding):
         parent = node.parent
         if parent == None:
             return encoding
         else:
-            encoding = self.__goForAncestor(parent, encoding)
+            encoding = self.__goToRoot(parent, encoding)
             encoding += node.encoding
             return encoding
 
@@ -105,7 +103,7 @@ class HuffumanTree:
     def reachAllLeafs(self, root):
         if root.lchild == None:
             value = root.value
-            encoding = self.__goForAncestor(root, '')
+            encoding = self.__goToRoot(root, '')
             self.encodingList[value] = encoding
             return
         else:
@@ -163,8 +161,8 @@ def compare(obj):
 
 
 if __name__ == "__main__":
-    from NodeDataIO import *
+    from CollectNode import *
 
-    io = NodeDataIO()
+    io = CollectNode()
     nodeList = io.getNodes()
     tree = HuffumanTree(nodeList)

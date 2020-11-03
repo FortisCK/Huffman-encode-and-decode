@@ -6,7 +6,7 @@
 import random, os
 
 
-class NodeDataIO:
+class CollectNode:
     def __init__(self):
         root = "password dictionary"
         file_names = []
@@ -45,5 +45,5 @@ class NodeDataIO:
 
 
 if __name__ == '__main__':
-    io = NodeDataIO()
+    io = CollectNode()
     print(io.getNodes())
